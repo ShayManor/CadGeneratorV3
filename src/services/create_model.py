@@ -2,10 +2,10 @@ import os
 
 import numpy as np
 import pyvista as pv
-from PIL import ImageDraw, Image
+from PIL import Image
 
 from src.helpers.create_path import create_path, get_image_name
-from src.helpers.gpt import prompt_image
+from src.helpers.gpt import prompt_image, prompt_text
 
 directions = {
     "front": np.array([0, -1, 0]),
@@ -17,6 +17,20 @@ directions = {
 }
 rows, cols = 2, 3
 
+def initial_prompt(prompt): return f"Write professional-grade, clean, and well-commented OpenSCAD (.scad) code that fully implements the following object: {prompt} The code should: Be modular and use functions or modules to encapsulate different parts (e.g., legs, base, backrest). Only return code with no explanation before or after. Include comments explaining key components and logic. Be syntactically correct and render without errors or warnings in OpenSCAD. Use correct dimensions and proportions that match the description, with realistic scale.Allow for basic customization via parameters (e.g., chair height, armrest width). Avoid overlapping geometry and ensure everything is solidly unioned."
+def second_prompt(prompt, code, feedback): return f"You are given the user's original prompt, their feedback on the current design, and the existing OpenSCAD code. Using this context, rewrite the entire OpenSCAD (.scad) file from scratch. Only return code, nothing else. Your new version should fully reflect the original design intent and address all the feedback. Structure your code cleanly, use modular components where appropriate, and include helpful comments explaining your design. Ensure the code is fully self-contained, compiles without errors or warnings in OpenSCAD, and results in a professional, realistic model. Do not leave any part of the model or feedback unaddressed, and overwrite the entire code file with your improved version. Original prompt: {prompt}, previous code: {code}, updated feedback: {feedback}"
+
+
+def get_code(prompt: str, prev_code: str, feedback: str) -> str:
+    code = prompt_text(initial_prompt(prompt)) if feedback is None else prompt_text(second_prompt(prompt, prev_code, feedback))
+    code.replace('```python', '')
+    code.replace('```scad', '```')
+    code.replace('```openscad', '')
+    code.replace('```cad', '')
+    code.replace('```OpenSCAD', '')
+    code.replace('```', '')
+    return code
+
 
 def create_model(prompt: str, path: str, feedback: str = None):
     """
@@ -26,6 +40,13 @@ def create_model(prompt: str, path: str, feedback: str = None):
     :param feedback: Feedback from previous model, can be None
     :return: Nothing
     """
+    prev_code = None
+    if feedback is not None:
+        with open(path, 'r') as f:
+            prev_code = "\n".join(f.readlines())
+    code = get_code(prompt, prev_code, feedback)
+    with open(path, 'w') as f:
+        f.writelines(code)
 
 
 def take_screenshots(path: str):
@@ -119,6 +140,7 @@ def get_feedback(prompt: str, path: str, name: str) -> str:
 
 def create_full_model(prompt: str, name: str, iterations: int = 1) -> str:
     """
+    Creates the cad model for the given params. First gets feedback and uses it to create the new model.
     :param name: Name of cad model
     :param iterations: Number of iterations
     :param prompt: Prompt to create cad model
@@ -129,10 +151,8 @@ def create_full_model(prompt: str, name: str, iterations: int = 1) -> str:
     for iteration in range(iterations):
         print(f"Begin iteration {iteration + 1}")
         if iteration != 0:
-            feedback = get_feedback(prompt, path)
+            feedback = get_feedback(prompt, path, name)
+            print(f"Feedback: {feedback}")
         path = create_path(name)
         create_model(prompt, path, feedback)
-
-        #  If there is a previous cad model, get feedback
-        #  Call create_model to make the new cad model
     return path
