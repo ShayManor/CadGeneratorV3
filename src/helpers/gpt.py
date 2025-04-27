@@ -2,10 +2,15 @@ import os
 from base64 import b64encode
 
 from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 def prompt_text(prompt: str, assistant: str = None, effort: str = None) -> str:
-    client = OpenAI()
+    client = OpenAI(api_key=API_KEY)
     if not assistant:
         completion = client.chat.completions.create(
             model="o3-mini",
