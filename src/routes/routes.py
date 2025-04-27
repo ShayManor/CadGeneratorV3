@@ -1,37 +1,67 @@
-from flask import Blueprint, render_template, request, jsonify
+import os
 
+from flask import Blueprint, render_template, request, jsonify, send_file
+from flask_cors import CORS
+import sys
+import traceback
 from src.services.create_model import create_full_model
 
 bp = Blueprint('main', __name__)
-
-
-@bp.route('/')
-def index():
-    pass
+CORS(bp)
 
 
 @bp.route('/create_model', methods=['POST'])
 def create_model():
-    print("Here")
+    data = request.get_json(silent=True) or request.form
+    prompt = data.get('prompt')
+    name   = data.get('name', 'model')
+    iters  = int(data.get('iterations', 1))
+
+    if not prompt:
+        return jsonify(error='Missing prompt'), 400
+
     try:
-        iterations: int = int(request.args.get('iterations')) | 1
-        prompt: str = request.args.get('prompt')
-        name: str = request.args.get('name')
+        path = create_full_model(prompt, name, iters)
+    except Exception as e:
+        traceback.print_exception(type(e), e, sys.exc_info()[2])
+        return jsonify(error=str(e)), 500
+
+    return send_file(path,
+                     as_attachment=True,
+                     download_name=f'{name}.stl',
+                     mimetype='application/sla')
+
+
+def create_model_2(data):
+    try:
+        iterations: int = int(data.get('iterations', 1))
+        prompt: str = data['prompt']
+        name: str = data['name']
         if not prompt:
-            return jsonify({"error": "Missing prompt"}), 400
+            return 400
         create_full_model(prompt, name, iterations)
     except Exception as e:
-        print(e)
-        return jsonify({"error": str(e)}), 500
-
+        traceback.print_exception(type(e), e, sys.exc_info()[2])
+        formatted_trace = traceback.format_exception(type(e), e, sys.exc_info()[2])
+        print("".join(formatted_trace))
+        return 500
+    return 200
 
 
 @bp.route('/get_model', methods=['POST'])
 def get_model():
     try:
-        id_num = int(request.args.get('id'))
-        if not id_num:
+        data = request.get_json(silent=True) or request.form
+        name = data.get('name')
+        if not name:
             return jsonify({"error": "Missing prompt"}), 400
+        for file in os.listdir('src/data'):
+            if file.endswith('.png'):
+                os.remove(os.path.join('src/data', file))
+        return send_file(f'src/data/{name}.stl',
+                         as_attachment=True,
+                         download_name=f'{name}.stl',
+                         mimetype='application/sla')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -42,3 +72,4 @@ def get_all_models():
         pass
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+

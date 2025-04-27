@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CAD Creator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Dark theme CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="/static/styles.css">
+
+  <!-- import‐map for “three” -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="has-background-dark has-text-light">
+  <section class="section">
+    <div class="container">
+
+      <h1 class="title has-text-light">CAD Creator</h1>
+
+      <!-- Generate New Model -->
+      <div class="box">
+        <form id="cadForm">
+          <div class="field">
+            <label class="label has-text-dark">Prompt</label>
+            <div class="control">
+              <textarea class="textarea" id="prompt" placeholder="Describe your model…" required></textarea>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label has-text-dark">Model Name</label>
+                <div class="control">
+                  <input class="input" id="name" type="text" placeholder="Mug" required>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label has-text-dark">Iterations</label>
+                <div class="control">
+                  <input class="input" id="iterations" type="number" value="3" min="1" max="10">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary" id="submitBtn" type="submit">Generate</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Load Existing Model -->
+      <div class="box">
+        <h2 class="subtitle has-text-dark">Load Existing Model</h2>
+        <form id="getModelForm">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" id="getModelName" type="text" placeholder="Model Name">
+            </div>
+            <div class="control">
+              <button class="button is-info" id="loadBtn" type="submit">Load Model</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Viewer -->
+      <div id="viewerBox" class="box" hidden>
+        <h2 class="title has-text-light" id="modelTitle"></h2>
+        <div class="canvas-container" style="height:400px;">
+          <canvas id="stlCanvas"></canvas>
+        </div>
+        <button class="button is-warning mt-3" id="downloadBtn" disabled>Download STL</button>
+      </div>
+
+    </div>
+  </section>
+
+  <script type="module" src="/static/index.js"></script>
+</body>
+</html>

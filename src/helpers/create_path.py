@@ -8,11 +8,11 @@ def create_path(name: str):
     index = 1
     while os.path.exists(os.path.join(prefix, name + str(index))):
         index += 1
-    return os.path.join(prefix, name + str(index))
+    return str(os.path.join(prefix, name + str(index)))
 
 
 def get_image_name(name: str):
-    return os.path.join('src/data', name)
+    return os.path.join('src/data', name + ".png")
 
 
 def get_final_image_path(name: str):
