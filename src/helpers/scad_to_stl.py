@@ -7,7 +7,7 @@ import traceback
 def scad_to_stl(scad_file_path: str, stl_file_path: str):
     if not os.path.isfile(scad_file_path):
         print(f"Error: The .scad file '{scad_file_path}' does not exist.")
-        # return
+        return "Sucess"
 
     if stl_file_path is None:
         base, _ = os.path.splitext(scad_file_path)
@@ -23,8 +23,8 @@ def scad_to_stl(scad_file_path: str, stl_file_path: str):
         traceback.print_exception(type(e), e, sys.exc_info()[2])
         formatted_trace = traceback.format_exception(type(e), e, sys.exc_info()[2])
         print("".join(formatted_trace))
-        return "Error"
-    return None
+        return None
+    return "Success"
 
 
 if __name__ == '__main__':
