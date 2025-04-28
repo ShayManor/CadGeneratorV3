@@ -55,12 +55,12 @@ def get_code(prompt: str, prev_code: str, feedback: str, status: str | None) -> 
     else:
         code = prompt_text(initial_prompt(prompt), assistant=initial_assistant) if feedback is None else prompt_text(
             second_prompt(prompt, prev_code, feedback), assistant=second_assistant)
-    code.replace('```python', '')
-    code.replace('```scad', '```')
-    code.replace('```openscad', '')
-    code.replace('```cad', '')
-    code.replace('```OpenSCAD', '')
-    code.replace('```', '')
+    code = code.replace('```python', '')
+    code = code.replace('```scad', '```')
+    code = code.replace('```openscad', '')
+    code = code.replace('```cad', '')
+    code = code.replace('```OpenSCAD', '')
+    code = code.replace('```', '')
     return code
 
 
@@ -172,7 +172,7 @@ def combine_screenshots(final_image_path: str) -> str:
     final_image.save(final_image_path + ".png")
 
     for view_name in directions.keys():
-        path = get_image_name(view_name + ".png")
+        path = get_image_name(view_name)
         if not os.path.exists(path):
             continue
         os.remove(path)
@@ -200,12 +200,13 @@ def create_full_model(prompt: str, name: str, iterations: int = 1) -> str:
     except FileExistsError as e:
         pass
     feedback = None
-    for iteration in range(0, iterations):
+    iteration = 0
+    while iteration < iterations:
         stl_path = path.replace('scad', 'stl')
         print(f"Begin iteration {iteration + 1}")
         create_model(prompt, path, feedback, None)
         status = scad_to_stl(path, stl_path)
-        if status != 0 and status:
+        if status:
             print(f"Status is {status}")
             create_model(prompt, path, feedback, status)
             iteration -= 1
