@@ -209,10 +209,9 @@ def create_full_model(prompt: str, name: str, iterations: int = 1) -> str:
         if not status:
             print(f"Status is {status}")
             create_model(prompt, path, feedback, status)
-            iteration -= 1
             continue
         feedback = get_feedback(prompt, stl_path, name)
-        # print(f"Feedback: {feedback}")
+        print(f"Feedback: {feedback}")
         path = create_path(name) + ".scad"
         iteration += 1
         # create_model(prompt, path, feedback)
