@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from src.helpers.create_path import create_path, get_image_name
-from src.helpers.gpt import prompt_image, prompt_text, prompt_image2
+from src.helpers.prompt import prompt_image, prompt_text, prompt_image2
 from src.helpers.scad_to_stl import scad_to_stl
 
 directions = {

@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def prompt_text(prompt: str, system: str = None) -> str:
+def prompt_text(prompt: str, system: str = None, model: str = "claude-3-7-sonnet-latest") -> str:
     client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     response = client.messages.create(
-        model="claude-3-7-sonnet-latest",
+        model=model,
         system=system,
         max_tokens=10_000,
         messages=[
@@ -42,6 +42,7 @@ def prompt_image2(prompt: str, system: str, path: str) -> str:
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1024,
+        system=system,
         messages=[
             {
                 "role": "user",
@@ -56,13 +57,12 @@ def prompt_image2(prompt: str, system: str, path: str) -> str:
                     },
                     {
                         "type": "text",
-                        "text": system
+                        "text": prompt
                     }
                 ],
             }
         ],
     )
-    print(message)
     return message.content[0].text
 
 
