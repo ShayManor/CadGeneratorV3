@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from src.helpers.create_path import create_path, get_image_name
 from src.helpers.prompt import prompt_image, prompt_text, prompt_image2
 from src.helpers.scad_to_stl import scad_to_stl
+from src.services.upload_model import upload_model
 
 directions = {
     "front": np.array([0, -1, 0]),
@@ -217,4 +218,5 @@ def create_full_model(prompt: str, name: str, iterations: int = 1) -> str:
         path = create_path(name) + ".scad"
         iteration += 1
         # create_model(prompt, path, feedback)
-    return path
+    upload_model(path.replace('scad', 'stl'))
+    return upload_model(path)

@@ -8,6 +8,7 @@ from flask_cors import CORS
 import sys
 import traceback
 from src.services.create_model import create_full_model
+from src.services.upload_model import download_model
 
 bp = Blueprint('main', __name__)
 CORS(bp)
@@ -47,12 +48,13 @@ def create_model():
         return jsonify(error='Missing prompt'), 400
 
     try:
-        path = create_full_model(prompt, name, iters)
+        key = create_full_model(prompt, name, iters)
+        file = download_model(key)
     except Exception as e:
         traceback.print_exception(type(e), e, sys.exc_info()[2])
         return jsonify(error=str(e)), 500
 
-    return send_file(path,
+    return send_file(file,
                      as_attachment=True,
                      download_name=f'{name}.stl',
                      mimetype='application/sla')
