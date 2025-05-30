@@ -1,6 +1,9 @@
 import os
-
+import json
+from pathlib import Path
 from flask import Blueprint, render_template, request, jsonify, send_file
+from flasgger import Swagger
+
 from flask_cors import CORS
 import sys
 import traceback
@@ -12,10 +15,33 @@ CORS(bp)
 
 @bp.route('/create_model', methods=['POST'])
 def create_model():
+    """
+        Create a new model
+        ---
+        tags:
+          - Model
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  size:
+                    type: integer
+                required: [name]
+        responses:
+          201:
+            description: model created
+          400:
+            description: bad request
+        """
     data = request.get_json(silent=True) or request.form
     prompt = data.get('prompt')
-    name   = data.get('name', 'model')
-    iters  = int(data.get('iterations', 1))
+    name = data.get('name', 'model')
+    iters = int(data.get('iterations', 1))
 
     if not prompt:
         return jsonify(error='Missing prompt'), 400
@@ -50,6 +76,27 @@ def create_model_2(data):
 
 @bp.route('/get_model', methods=['POST'])
 def get_model():
+    """
+        Get a model from a name
+        ---
+        tags:
+          - Model
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                required: [name]
+        responses:
+          200:
+            description: model received
+          400:
+            description: bad request
+        """
     try:
         data = request.get_json(silent=True) or request.form
         name = data.get('name')
@@ -72,4 +119,3 @@ def get_all_models():
         pass
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-

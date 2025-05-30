@@ -1,6 +1,7 @@
 import os
 from idlelib.run import flush_stdout
-
+import json
+from pathlib import Path
 import mss
 import numpy as np
 import trimesh
@@ -9,7 +10,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from src.helpers.create_path import create_path, get_image_name
-from src.helpers.gpt import prompt_image, prompt_text
+from src.helpers.gpt import prompt_image, prompt_text, prompt_image2
 from src.helpers.scad_to_stl import scad_to_stl
 
 directions = {
@@ -22,6 +23,9 @@ directions = {
     "top": np.array([0, 0, 1]),
     "bottom": np.array([0, 0, -1])
 }
+with Path("prompts.json").open() as f:
+    PROMPT_STORE = json.load(f)
+
 rows, cols = 2, 4
 
 initial_assistant = "asst_oQcmjRALDMEG7V0mlFCYQw2z"
@@ -38,8 +42,6 @@ def second_prompt(prompt, code,
                   feedback): return f"You are given the user's original prompt, their feedback on the current design, and the existing OpenSCAD code. Using this context, rewrite the entire OpenSCAD (.scad) file from scratch. Only return code, nothing else. Follow good code standard such as always using brackets for if, else, for, etc. Make the simple changes, for example if you need to remove a piece, just remove it. Your new version should fully reflect the original design intent and address all the feedback. Structure your code cleanly, use modular components where appropriate, and include helpful comments explaining your design. Ensure the code is fully self-contained, compiles without errors or warnings in OpenSCAD, and results in a professional, realistic model. Do not leave any part of the model or feedback unaddressed, and overwrite the entire code file with your improved version. Original prompt: {prompt}, previous code: {code}, updated feedback: {feedback}"
 
 
-def describe_prompt(
-        prompt): return f"You are a professional describer for a cad model who recieves the perspectives and is tasked with giving improvements for how to make it better. This image is supposed to be a {prompt}. Structure your response as score:description where score is a number (worst) 1-5 (best) describing how close the image is to the prompt. Be simple and straight to the point, you are giving instructions to fix it. Be detailed and descriptive. Only go over the things that need changing and be concise, for example if there is an extra piece, just say there is an extra piece, don't cover things that are already good."
 
 
 bug_fix_assistant = "asst_72OVgDJbiEb0U30WqD7gt5dL"
@@ -51,10 +53,10 @@ def fail_prompt(status, prompt,
 
 def get_code(prompt: str, prev_code: str, feedback: str, status: str | None) -> str:
     if status:
-        code = prompt_text(fail_prompt(status, prompt, prev_code), assistant=bug_fix_assistant)
+        code = prompt_text(fail_prompt(status, prompt, prev_code), system=PROMPT_STORE["Bug Fixer"])
     else:
-        code = prompt_text(initial_prompt(prompt), assistant=initial_assistant) if feedback is None else prompt_text(
-            second_prompt(prompt, prev_code, feedback), assistant=second_assistant)
+        code = prompt_text(initial_prompt(prompt), system=PROMPT_STORE["Cad Creator"]) if feedback is None else prompt_text(
+            second_prompt(prompt, prev_code, feedback), system=PROMPT_STORE["Cad Fixer"])
     code = code.replace('```python', '')
     code = code.replace('```scad', '```')
     code = code.replace('```openscad', '')
@@ -182,7 +184,7 @@ def combine_screenshots(final_image_path: str) -> str:
 def get_feedback(prompt: str, path: str, name: str) -> str:
     take_screenshots(path)
     final_image_path = combine_screenshots(f"src/data/{name}")
-    feedback = prompt_image(describe_prompt(prompt), final_image_path)
+    feedback = prompt_image2(prompt, PROMPT_STORE["Image Describer"], final_image_path)
     return feedback
 
 
