@@ -1,4 +1,3 @@
-/* Tailwind-like utility, very small for demo */
 :root { --gold:#d4af37; --black:#000; --gray:#222; --bg:#111; }
 *{box-sizing:border-box;font-family:system-ui, sans-serif;color:#eee}
 body{margin:0;background:var(--bg);display:flex;justify-content:center}

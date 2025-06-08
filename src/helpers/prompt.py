@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def prompt_text(prompt: str, system: str = None, model: str = "claude-3-7-sonnet-latest") -> str:
+def prompt_text(prompt: str, system: str = None, model: str = "claude-sonnet-4-20250514") -> str:
     client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     response = client.messages.create(
         model=model,

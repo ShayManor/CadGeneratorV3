@@ -7,7 +7,10 @@ from flasgger import Swagger
 from flask_cors import CORS
 import sys
 import traceback
+
+from src.helpers.upload import upload
 from src.services.create_model import create_full_model
+from src.services.get_model import get_model_from_bucket
 
 bp = Blueprint('main', __name__)
 CORS(bp)
@@ -47,15 +50,16 @@ def create_model():
         return jsonify(error='Missing prompt'), 400
 
     try:
+        print(f'Creating {name}')
         path = create_full_model(prompt, name, iters)
     except Exception as e:
         traceback.print_exception(type(e), e, sys.exc_info()[2])
         return jsonify(error=str(e)), 500
-
-    return send_file(path,
-                     as_attachment=True,
-                     download_name=f'{name}.stl',
-                     mimetype='application/sla')
+    print(upload(name, path))
+    return send_file(get_model_from_bucket(name),
+                         as_attachment=True,
+                         download_name=f'{name}.stl',
+                         mimetype='application/sla')
 
 
 def create_model_2(data):
@@ -100,12 +104,13 @@ def get_model():
     try:
         data = request.get_json(silent=True) or request.form
         name = data.get('name')
+        print(f'Name: {name}')
         if not name:
-            return jsonify({"error": "Missing prompt"}), 400
+            return jsonify({"error": "Missing name"}), 400
         for file in os.listdir('src/data'):
             if file.endswith('.png'):
                 os.remove(os.path.join('src/data', file))
-        return send_file(f'src/data/{name}.stl',
+        return send_file(get_model_from_bucket(name),
                          as_attachment=True,
                          download_name=f'{name}.stl',
                          mimetype='application/sla')
