@@ -7,3 +7,5 @@ steps:
     entrypoint: 'gcloud'
     args: ['run','deploy','cadalix','--image','gcr.io/cadalix/cadalix:$SHORT_SHA',
            '--region','us-central1','--platform','managed','--quiet']
+options:
+  logging: CLOUD_LOGGING_ONLY
