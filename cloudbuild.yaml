@@ -2,7 +2,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build','--platform=linux/amd64','-t','gcr.io/cadalix/cadalix:$SHORT_SHA','.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push','gcr.io/$PROJECT_ID/cadalix:$SHORT_SHA']
+    args: ['push','gcr.io/cadalix/cadalix:$SHORT_SHA']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args: ['run','deploy','cadalix','--image','gcr.io/cadalix/cadalix:$SHORT_SHA',
