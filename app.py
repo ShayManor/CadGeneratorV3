@@ -10,9 +10,11 @@ def require_api_key(app):
     @app.before_request
     def check_key():
         if request.path in ("/", "/ping"):
-            return  # health & front-page stay open
+            return
+        if not os.path.exists('src/data'):
+            os.mkdir('src/data')
         print(request.headers.get("X-API-Key"))
-        if request.headers.get("X-API-Key") != VALID_KEY and False:
+        if request.headers.get("X-API-Key") != VALID_KEY:
             abort(401, description="Invalid or missing API key")
 
 
@@ -47,4 +49,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)

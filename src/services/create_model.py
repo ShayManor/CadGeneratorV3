@@ -1,8 +1,6 @@
 import os
-from idlelib.run import flush_stdout
 import json
 from pathlib import Path
-import mss
 import numpy as np
 import trimesh
 from PIL import Image
