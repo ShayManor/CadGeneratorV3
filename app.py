@@ -14,7 +14,7 @@ def require_api_key(app):
         if not os.path.exists('src/data'):
             os.mkdir('src/data')
         print(request.headers.get("X-API-Key"))
-        if request.headers.get("X-API-Key") != VALID_KEY and False:
+        if request.headers.get("X-API-Key") != VALID_KEY:
             abort(401, description="Invalid or missing API key")
 
 
