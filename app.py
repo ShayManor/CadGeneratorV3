@@ -50,3 +50,17 @@ def index():
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
+
+
+# TODO:
+# 1) Fix OPENSCAD on GCR
+# 2) Make sure GCR is ok
+# 3) Make sure cadalix.com is ok
+# 4) Fix frontend
+# 5) Launch frontend
+# 6) Add prompt expander
+# 7) Fix s3 bucket (make it a real db with saved prompts and text descriptions)
+# 8) Fix get all models
+# 9) Add API Keys
+# 10) Launch :)
+# 11) Market :)

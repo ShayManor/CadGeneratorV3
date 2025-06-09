@@ -13,7 +13,7 @@ def scad_to_stl(scad_file_path: str, stl_file_path: str):
         base, _ = os.path.splitext(scad_file_path)
         stl_file_path = f"{base}.stl"
     command = [
-        "/Users/shay/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD",
+        "/usr/bin/openscad",
         "-o", stl_file_path,
         scad_file_path
     ]
